@@ -1,0 +1,32 @@
+[
+    {
+        "blockExplorer": "https://www.tauhq.com",
+        "currencySymbol": "TAU",
+        "hosts": [
+            "https://masternode-01.lamden.io"
+        ],
+        "name": "Lamden Mainnet",
+        "type": "mainnet"
+    },
+    {
+        "currencySymbol": "dTAU",
+        "hosts": [
+            "https://testnet-master-1.lamden.io"
+        ],
+        "name": "Lamden Testnet",
+        "type": "testnet"
+    },
+    {
+			"blockExplorer": "https://testnetv2.tauhq.com",
+			"currencySymbol": "dTAU2",
+			"hosts": [
+				"https://testnet-v2-master-lon.lamden.io",
+				"https://testnet-v2-master-sf.lamden.io",
+				"https://testnet-v2-master-bang.lamden.io"
+			],
+			"name": "Lamden Testnet_V2",
+			"type": "testnet",
+            "version": 2,
+            "lamden": true
+    }
+]

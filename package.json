@@ -1,0 +1,30 @@
+{
+  "name": "governance_js",
+  "version": "1.0.0",
+  "description": "A simple interface for running governance commands via cli",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "lamden_gov": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lamden/governance_js.git"
+  },
+  "author": "JeffWScott",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Lamden/governance_js/issues"
+  },
+  "homepage": "https://github.com/Lamden/governance_js#readme",
+  "dependencies": {
+    "args": "^5.0.3",
+    "lamden-js": "^3.8.0",
+    "node-fetch": "^3.2.10",
+    "prompt-sync": "^4.2.0"
+  }
+}
