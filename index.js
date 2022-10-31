@@ -46,7 +46,7 @@ const router = {
 	"2": register_unregister_node,
 	"3": vote_for_node_menu,
 	"4": introduce_motions_menu,
-	"5": vote_on_motions,
+	"5": vote_on_motions_menu,
 	"6": pickNetwork,
 	"7": get_sk,
 	"8": refresh_and_return
@@ -434,7 +434,7 @@ async function vote_for_node_menu(){
 	}
 }
 
-async function vote_on_motions(){
+async function vote_on_motions_menu(){
 	router["back"] = showMainMenu
 
 	console.log("\n--------------------------")
@@ -453,7 +453,7 @@ async function vote_on_motions(){
 
 	if (handle_special_prompts(policy)) return
 
-	if (!prompt_in_range(policy, num_of_policies)) vote_on_motions()
+	if (!prompt_in_range(policy, num_of_policies)) vote_on_motions_menu()
 
 	policy = Object.keys(policies).map(k => k)[policy - 1]
 
@@ -478,17 +478,19 @@ async function vote_on_motions(){
 		if (handle_special_prompts(okay)) return
 
 		if (okay === "yes"){
-			const vote_on_motions_runner = VoteOnMotions(network)
-
-			await vote_on_motions_runner.send(sender_wallet, policy, vote).catch(console.error)
+			const vote_on_motions = VoteOnMotions(network)
+			await vote_on_motions.send(sender_wallet, policy, vote).catch(console.error)
 		
 			showMainMenu()
 		}else{
-			vote_on_motions()
+			vote_on_motions_menu()
 		}
 	} else {
-		vote_on_motions()
+		vote_on_motions_menu()
 	}
+
+
+
 
 }
 

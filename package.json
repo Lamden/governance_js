@@ -1,6 +1,6 @@
 {
   "name": "governance_js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple interface for running governance commands via cli",
   "main": "index.js",
   "type": "module",
