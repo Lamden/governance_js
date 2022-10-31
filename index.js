@@ -389,7 +389,7 @@ async function introduce_motions_menu(){
 		let confirm = prompt(": ");
 		if (confirm === motion){
 			const introduce_motions = IntroduceMotions(network, sender_wallet)
-			await introduce_motions.send(sender_wallet)
+			await introduce_motions.send(motion)
 			showMainMenu()
 		}else{
 			console.log("\nINTRODUCE MOTION CANCELLED")

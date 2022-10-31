@@ -20,7 +20,7 @@ export default (network, sender_wallet) => {
             },
             stampLimit: 50,
         }
-e
+
         await send_lamden_tx(sender_wallet, network, txInfo) 
     }
     
