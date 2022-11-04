@@ -1,9 +1,8 @@
 import send_lamden_tx from './send_tx.js'
-import { is_registered } from './utils.js'
 
-export default (network, sender_wallet) => {
+export default (sender_wallet) => {
     async function check_if_registered(){
-        const registered = await is_registered(network, sender_wallet.vk)
+        const registered = await process.app_utils.is_registered(sender_wallet.vk)
 
         if (!registered) console.log("\n!! Node is not registered !!")
 
@@ -19,7 +18,7 @@ export default (network, sender_wallet) => {
             stampLimit: 50,
         }
 
-        await send_lamden_tx(sender_wallet, network, txInfo)      
+        await send_lamden_tx(sender_wallet, txInfo)      
     }
 
     async function send(){

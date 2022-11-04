@@ -14,12 +14,16 @@ import VoteForNode from './src/vote_for_node.js'
 // Networks
 import network_list from './src/networks.json' assert { type: 'json' }
 
+// Misc
+import utils from './src/utils.js'
+import util from 'util'
+
+
 const { wallet } = Lamden
 
-const prompt = pr()
+
 
 let sender_wallet = null
-let network = null
 let init = false
 let TAU_balance = 0
 
@@ -36,12 +40,17 @@ const main_menu = [
 
 const policies = {
 	"masternodes": [
-		"Add Seat", "Remove Seat", "Remove Member"
+		"Add Seat", "Remove Member"
 	]
 }
 const num_of_policies = Object.keys(policies).map(k => k).length
 
-const router = {
+
+process.prompt = pr()
+process.app_utils = utils
+process.log = (obj) => console.log(util.inspect(obj, false, null, true))
+process.exit_app = exit
+process.router = {
 	"1": make_transfer,
 	"2": register_unregister_node,
 	"3": vote_for_node_menu,
@@ -52,7 +61,10 @@ const router = {
 	"8": refresh_and_return
 }
 
+process.current_prompt = () => `${process.lamden_network.name}`
+
 process.on('SIGINT', exit);
+//process.on('SIGKILL', exit);
 
 function showHeader(){
 	console.log("\n--------------------------")
@@ -64,7 +76,7 @@ function showHeader(){
 
 function pickNetwork(){
 	if (init){
-		router["back"] = showMainMenu
+		process.router["back"] = showMainMenu
 	}
 	console.log("\n--------------------------")
 	console.log("      SELECT NETWORK")
@@ -77,18 +89,18 @@ function pickNetwork(){
 	console.log(`\n${network_list.length + 1}) Exit`)
 
 	console.log(`\nChoose option (1-${network_list.length}, exit)`)
-	let opt = prompt(": ");
+	let opt = process.prompt(": ");
 
-	if (!init) router["back"] = pickNetwork
+	if (!init) process.router["back"] = pickNetwork
 
-	if (handle_special_prompts(opt))return
+	if(process.app_utils.handle_special_prompts(opt))return
 
 	opt = parseInt(opt)
 
 	if (!isNaN(opt) && opt > 0 && opt <= network_list.length + 1){
 		if (opt === network_list.length + 1) exit()
 		else{
-			network = new Lamden.Network(network_list[opt - 1])
+			process.lamden_network = new Lamden.Network(network_list[opt - 1])
 
 			if (!init) get_sk()
 			else showMainMenu()
@@ -100,13 +112,13 @@ function pickNetwork(){
 
 function showMainMenu(){
 	init = true
-	router["back"] = showMainMenu
+	process.router["back"] = showMainMenu
 
 	console.log("\n--------------------------")
 	console.log("        MAIN MENU")
 	console.log("--------------------------")
 	console.log(`Wallet: ${sender_wallet.vk}`)
-	console.log(`${network.currencySymbol} Balance: ${TAU_balance}`)
+	console.log(`${process.lamden_network.currencySymbol} Balance: ${TAU_balance}`)
 	console.log("--------------------------")
 	for (let item of main_menu){
 		console.log(item)
@@ -114,27 +126,27 @@ function showMainMenu(){
 	console.log(`\n${main_menu.length + 1}) Exit`)
 	console.log("--------------------------")
 
-	console.log(`\n[${network.name}] Choose Action (1-${main_menu.length + 1})`)
-	let opt = prompt(': ');
+	console.log(`\n[${process.current_prompt()}] Choose Action (1-${main_menu.length + 1})`)
+	let opt = process.prompt(': ');
 
 	if (parseInt(opt) === main_menu.length + 1) exit()
 
-	if (handle_special_prompts(opt)) return
+	if(process.app_utils.handle_special_prompts(opt)) return
 
 	opt = parseInt(opt)
 
 	if (isNaN(opt) || !prompt_in_range(opt, main_menu.length + 1)) showMainMenu()
 	else{
-		router["back"] = showMainMenu
-		router[opt]()
+		process.router["back"] = showMainMenu
+		process.router[opt]()
 	}
 }
 
 async function get_sk(){
 	if (!init){
-		router["back"] = pickNetwork
+		process.router["back"] = pickNetwork
 	}else{
-		router["back"] = showMainMenu
+		process.router["back"] = showMainMenu
 	}
 	console.log("\n--------------------------")
 	console.log("      RECOVER WALLET")
@@ -142,10 +154,10 @@ async function get_sk(){
 	console.log("  - Enter the PRIVATE KEY of a lamden keypair to recover the wallet.")
 	console.log("  - or type BACK to go back")
 	console.log("  - or type EXIT to quit")
-	console.log(`\n[${network.name}] Enter wallet Private Key to continue`)
-	const sk = prompt(": ");
+	console.log(`\n[${process.current_prompt()}] Enter wallet Private Key to continue`)
+	const sk = process.prompt(": ");
 
-	if (handle_special_prompts(sk)) return
+	if(process.app_utils.handle_special_prompts(sk)) return
 
 	try{
 		sender_wallet = wallet.create_wallet({sk})
@@ -161,41 +173,41 @@ async function get_sk(){
 	console.log("      CONFIRM WALLET")
 	console.log("--------------------------")
 	console.log(`  - Wallet Address: ${sender_wallet.vk}`)
-	console.log(`  - ${network.currencySymbol} Balance: ${TAU_balance}`)
+	console.log(`  - ${process.lamden_network.currencySymbol} Balance: ${TAU_balance}`)
 	
-	console.log(`\n[${network.name}] Is this the correct walllet address? (yes/no)`)
-	let okay = prompt(": ");
+	console.log(`\n[${process.current_prompt()}] Is this the correct walllet address? (yes/no)`)
+	let okay = process.prompt(": ");
 
-	if (handle_special_prompts(okay)) return
+	if(process.app_utils.handle_special_prompts(okay)) return
 
 	if (okay.toLocaleLowerCase() !== "yes") get_sk()
 	else showMainMenu()
 }
 
 async function make_transfer(){
-	router["back"] = showMainMenu
+	process.router["back"] = showMainMenu
 
 	console.log("\n--------------------------")
 	console.log("      MAKE TRANSFER")
 	console.log("--------------------------")
 	console.log("  - type BACK to go back or EXIT to quit")
-	console.log(`\n[${network.name}] How much TAU to transfer?`)
-	let amount = prompt(": ");
+	console.log(`\n[${process.current_prompt()}] How much TAU to transfer?`)
+	let amount = process.prompt(": ");
 
-	if (handle_special_prompts(amount)) return
+	if(process.app_utils.handle_special_prompts(amount)) return
 
-	console.log(`[${network.name}] Who to transfer to?`)
-	let to = prompt(": ");
+	console.log(`[${process.current_prompt()}] Who to transfer to?`)
+	let to = process.prompt(": ");
 
-	if (handle_special_prompts(to)) return
+	if(process.app_utils.handle_special_prompts(to)) return
 
-	console.log(`\n[${network.name}] Transfer ${amount} TAU to ${to}? (yes/no)`)
-	let okay = prompt(": ");
+	console.log(`\n[${process.current_prompt()}] Transfer ${amount} TAU to ${to}? (yes/no)`)
+	let okay = process.prompt(": ");
 
-	if (handle_special_prompts(okay)) return
+	if(process.app_utils.handle_special_prompts(okay)) return
 
 	if (okay.toLocaleLowerCase() === 'yes') {
-		let transfer = Transfer(network)
+		let transfer = Transfer()
 		await transfer.send(sender_wallet, amount, to).catch(console.error)
 	}
 
@@ -203,7 +215,7 @@ async function make_transfer(){
 }
 
 async function register_unregister_node(){
-	router["back"] = showMainMenu
+	process.router["back"] = showMainMenu
 
 	console.log("\n--------------------------")
 	console.log(" REGISTER/UNREGISTER NODE")
@@ -214,39 +226,39 @@ async function register_unregister_node(){
 	console.log(`2) Unregister Node`)
 	console.log(`\n3) Back`)
 
-	console.log(`\n[${network.name}] Choose option (1-3)`)
-	let opt = prompt(": ");
+	console.log(`\n[${process.current_prompt()}] Choose option (1-3)`)
+	let opt = process.prompt(": ");
 
-	if (handle_special_prompts(opt)) return
+	if(process.app_utils.handle_special_prompts(opt)) return
 	
 	opt = parseInt(opt)
 	if (isNaN(opt) || !prompt_in_range(opt, 3)) register_unregister_node()
 	else{
 		if (opt === 1) register_node_menu()
 		if (opt === 2) unregister_node_menu()
-		if (opt === 3) router["back"]()
+		if (opt === 3) process.router["back"]()
 	}
 }
 
 async function register_node_menu(){
-	router["back"] = register_unregister_node
+	process.router["back"] = register_unregister_node
 
 	function not_valid(){
 		console.log(`\n1) Back`)
 
-		console.log(`\n[${network.name}] Choose option (1)`)
-		let opt = prompt(": ");
+		console.log(`\n[${process.current_prompt()}] Choose option (1)`)
+		let opt = process.prompt(": ");
 
-		if (handle_special_prompts(opt)) return
+		if(process.app_utils.handle_special_prompts(opt)) return
 		
 		opt = parseInt(opt)
 		if (isNaN(opt) || !prompt_in_range(opt, 1)) register_node_menu()
 		else{
-			if (opt === 1) router["back"]()
+			if (opt === 1) process.router["back"]()
 		}
 	}
 
-	let register = Register(network, sender_wallet)
+	let register = Register(sender_wallet)
 
 	console.log("\n--------------------------")
 	console.log("      REGISTER NODE")
@@ -263,28 +275,28 @@ async function register_node_menu(){
 			console.log(`\n1) Register Node`)
 			console.log(`2) Back`)
 	
-			console.log(`\n[${network.name}] Choose option (1-2)`)
-			let opt = prompt(": ");
+			console.log(`\n[${process.current_prompt()}] Choose option (1-2)`)
+			let opt = process.prompt(": ");
 	
-			if (handle_special_prompts(opt)) return
+			if(process.app_utils.handle_special_prompts(opt)) return
 			
 			opt = parseInt(opt)
 			if (isNaN(opt) || !prompt_in_range(opt, 2)) register_node_menu()
 			else{
 				if (opt === 1) {
-					console.log(`\n[${network.name}] Type 'register' to confirm`)
-					let confirm = prompt(": ");
+					console.log(`\n[${process.current_prompt()}] Type 'register' to confirm`)
+					let confirm = process.prompt(": ");
 
 					if (confirm === 'register'){
 						await register.send()
 						register_node_menu()
 					}else{
 						console.log('\n> REGISTER CANCELLED')
-						await async_sleep(1000)
+						await process.app_utils.async_sleep(1000)
 						register_node_menu()
 					}
 				}
-				if (opt === 2) router["back"]()
+				if (opt === 2) process.router["back"]()
 			}
 		}else{
 			not_valid
@@ -295,9 +307,9 @@ async function register_node_menu(){
 }
 
 async function unregister_node_menu(){
-	router["back"] = register_unregister_node
+	process.router["back"] = register_unregister_node
 
-	let unregister = Unregister(network, sender_wallet)
+	let unregister = Unregister(sender_wallet)
 
 	console.log("\n--------------------------")
 	console.log("     UNREGISTER NODE")
@@ -310,47 +322,47 @@ async function unregister_node_menu(){
 		console.log(`\n1) Unregister Node`)
 		console.log(`2) Back`)
 
-		console.log(`\n[${network.name}] Choose option (1-2)`)
-		let opt = prompt(": ");
+		console.log(`\n[${process.current_prompt()}] Choose option (1-2)`)
+		let opt = process.prompt(": ");
 
-		if (handle_special_prompts(opt)) return
+		if(process.app_utils.handle_special_prompts(opt)) return
 		
 		opt = parseInt(opt)
 		if (isNaN(opt) || !prompt_in_range(opt, 2)) unregister_node_menu()
 		else{
 			if (opt === 1) {
-				console.log(`\n[${network.name}] Type 'unregister' to confirm`)
-				let confirm = prompt(": ");
+				console.log(`\n[${process.current_prompt()}] Type 'unregister' to confirm`)
+				let confirm = process.prompt(": ");
 
 				if (confirm === 'unregister'){
 					await unregister.send()
 					unregister_node_menu()
 				}else{
 					console.log('\n> UNREGISTER CANCELLED')
-					await async_sleep(1000)
+					await process.app_utils.async_sleep(1000)
 					unregister_node_menu()
 				}
 			}
-			if (opt === 2) router["back"]()
+			if (opt === 2) process.router["back"]()
 		}
 	}else{
 		console.log(`\n1) Back`)
 
-		console.log(`\n[${network.name}] Choose option (1)`)
-		let opt = prompt(": ");
+		console.log(`\n[${process.current_prompt()}] Choose option (1)`)
+		let opt = process.prompt(": ");
 
-		if (handle_special_prompts(opt)) return
+		if(process.app_utils.handle_special_prompts(opt)) return
 		
 		opt = parseInt(opt)
 		if (isNaN(opt) || !prompt_in_range(opt, 1)) unregister_node_menu()
 		else{
-			if (opt === 1) router["back"]()
+			if (opt === 1) process.router["back"]()
 		}
 	}
 }
 
 async function introduce_motions_menu(){
-	router["back"] = showMainMenu
+	process.router["back"] = showMainMenu
 	
 	console.log("\n--------------------------")
 	console.log("    INTRODUCE MOTIONS")
@@ -363,10 +375,10 @@ async function introduce_motions_menu(){
 		console.log(`${index + 1 }) ${policy}`)
 	}
 
-	console.log(`\n[${network.name}] Choose a policy (1-${num_of_policies})`)
-	let policy = prompt(": ");
+	console.log(`\n[${process.current_prompt()}] Choose a policy (1-${num_of_policies})`)
+	let policy = process.prompt(": ");
 
-	if (handle_special_prompts(policy)) return
+	if(process.app_utils.handle_special_prompts(policy)) return
 	if (!prompt_in_range(policy, num_of_policies)) introduce_motions_menu()
 	
 	const motions = policies[Object.keys(policies).map(k => k)[policy - 1]]
@@ -376,33 +388,23 @@ async function introduce_motions_menu(){
 		console.log(`${index + 1 }) ${motion}`)
 	}
 	
-	console.log(`\n[${network.name}] Choose a motion (1-${motions.length})`)
-	let okay = prompt(": ");
+	console.log(`\n[${process.current_prompt()}] Choose a motion (1-${motions.length})`)
+	let okay = process.prompt(": ");
 
-	if (handle_special_prompts(okay)) return
+	if(process.app_utils.handle_special_prompts(okay)) return
 
 	if (!prompt_in_range(okay, motions.length)) introduce_motions_menu()
 	else{
 		const motion = motions[parseInt(okay) - 1]
 
-		console.log(`\n[${network.name}] Type '${motion}' to confirm`)
-		let confirm = prompt(": ");
-		if (confirm === motion){
-			const introduce_motions = IntroduceMotions(network, sender_wallet)
-			await introduce_motions.send(motion)
-			showMainMenu()
-		}else{
-			console.log("\nINTRODUCE MOTION CANCELLED")
-			await async_sleep(1000)
-			introduce_motions_menu()
-		}
-
-
+		const introduce_motions = IntroduceMotions(sender_wallet)
+		await introduce_motions.send(motion)
+		introduce_motions_menu()
 	}
 }
 
 async function vote_for_node_menu(){
-	router["back"] = showMainMenu
+	process.router["back"] = showMainMenu
 	
 	console.log("\n--------------------------")
 	console.log("      VOTE FOR NODE")
@@ -410,13 +412,13 @@ async function vote_for_node_menu(){
 	console.log("- Provide the Public Key (vk) of the node you want to vote for")
 	console.log("- type BACK to go back or EXIT to quit\n")
 
-	console.log(`\n[${network.name}] Enter Node Public Key (VK)`)
-	let node_vk = prompt(": ");
+	console.log(`\n[${process.current_prompt()}] Enter Node Public Key (VK)`)
+	let node_vk = process.prompt(": ");
 
-	if (handle_special_prompts(node_vk)) return
+	if(process.app_utils.handle_special_prompts(node_vk)) return
 
 	if (Lamden.utils.isLamdenKey(node_vk)){
-		const vote_for_node = VoteForNode(network, sender_wallet)
+		const vote_for_node = VoteForNode(sender_wallet)
 		const node_is_registered =  await vote_for_node.node_is_registered(node_vk)
 
 		if (node_is_registered){
@@ -424,18 +426,18 @@ async function vote_for_node_menu(){
 			vote_for_node_menu()
 		}else{
 			console.log("\n> NOT A REGISTERED NODE")
-			await async_sleep(1000)
+			await process.app_utils.async_sleep(1000)
 			vote_for_node_menu()
 		}
 	}else{
 		console.log("\n> INVALID LAMDEN KEY")
-		await async_sleep(1000)
+		await process.app_utils.async_sleep(1000)
 		vote_for_node_menu()
 	}
 }
 
 async function vote_on_motions_menu(){
-	router["back"] = showMainMenu
+	process.router["back"] = showMainMenu
 
 	console.log("\n--------------------------")
 	console.log("    VOTE ON MOTIONS")
@@ -448,10 +450,10 @@ async function vote_on_motions_menu(){
 		console.log(`${index + 1 }) ${policy}`)
 	}
 
-	console.log(`\n[${network.name}] Choose a policy (1-${num_of_policies})`)
-	let policy = prompt(": ");
+	console.log(`\n[${process.current_prompt()}] Choose a policy (1-${num_of_policies})`)
+	let policy = process.prompt(": ");
 
-	if (handle_special_prompts(policy)) return
+	if(process.app_utils.handle_special_prompts(policy)) return
 
 	if (!prompt_in_range(policy, num_of_policies)) vote_on_motions_menu()
 
@@ -459,26 +461,26 @@ async function vote_on_motions_menu(){
 
 	console.log(`\nVote on current ${policy} policy`)
 
-	console.log(`\n[${network.name}] How to vote? (yay/nay)`)
-	let vote = prompt(": ");
+	console.log(`\n[${process.current_prompt()}] How to vote? (yay/nay)`)
+	let vote = process.prompt(": ");
 
-	if (handle_special_prompts(vote)) return
+	if(process.app_utils.handle_special_prompts(vote)) return
 
 	if (vote === "yay" || vote === "nay"){
 		if (vote === "yay"){
 			vote = true
-			console.log(`\n[${network.name}] CONFIRM YAY VOTE (yes/no)`)
+			console.log(`\n[${process.current_prompt()}] CONFIRM YAY VOTE (yes/no)`)
 			
 		}else{
 			vote = false
-			console.log(`\n[${network.name}] CONFIRM NAY VOTE (yes/no)`)
+			console.log(`\n[${process.current_prompt()}] CONFIRM NAY VOTE (yes/no)`)
 		}
-		const okay = prompt(': ')
+		const okay = process.prompt(': ')
 
-		if (handle_special_prompts(okay)) return
+		if(process.app_utils.handle_special_prompts(okay)) return
 
 		if (okay === "yes"){
-			const vote_on_motions = VoteOnMotions(network)
+			const vote_on_motions = VoteOnMotions()
 			await vote_on_motions.send(sender_wallet, policy, vote).catch(console.error)
 		
 			showMainMenu()
@@ -487,19 +489,6 @@ async function vote_on_motions_menu(){
 		}
 	} else {
 		vote_on_motions_menu()
-	}
-
-
-
-
-}
-
-function handle_special_prompts(value){
-	if (value === null) exit()
-	if (value.toLowerCase() === "exit" || value.toLowerCase() === "quit") exit()
-	if (value.toLowerCase() === "back") {
-		router["back"]()
-		return true
 	}
 }
 
@@ -521,13 +510,7 @@ function refresh_and_return(){
 }
 
 async function refresh_balance(){
-	TAU_balance = await network.API.getCurrencyBalance(sender_wallet.vk)
-}
-
-function async_sleep(ms){
-	return new Promise(resolver => {
-		setTimeout(resolver, ms)
-	})
+	TAU_balance = await process.lamden_network.API.getCurrencyBalance(sender_wallet.vk)
 }
 
 function start(){

@@ -1,13 +1,12 @@
 import send_lamden_tx from './send_tx.js'
-import { get_approval_amount, is_registered } from './utils.js'
 
-export default (network, sender_wallet) => {
+export default (sender_wallet) => {
     async function node_is_registered(vk){
-        return await is_registered(network, vk)
+        return await process.app_utils.is_registered(vk)
     }
 
     async function send_approval(){
-        let approval_amount = await get_approval_amount(network, sender_wallet.vk, "elect_masternodes")
+        let approval_amount = await process.app_utils.get_approval_amount(sender_wallet.vk, "elect_masternodes")
         if (approval_amount.isGreaterThan(50)) return
 
         const txInfo = {
@@ -21,7 +20,7 @@ export default (network, sender_wallet) => {
             stampLimit: 50,
         }
 
-        await send_lamden_tx(sender_wallet, network, txInfo) 
+        await send_lamden_tx(sender_wallet, txInfo) 
     }
     
     async function send_vote(vk){
@@ -35,7 +34,7 @@ export default (network, sender_wallet) => {
             stampLimit: 50,
         }
 
-        await send_lamden_tx(sender_wallet, network, txInfo)        
+        await send_lamden_tx(sender_wallet, txInfo)        
     }
 
     async function send(vk){

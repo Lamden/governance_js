@@ -1,13 +1,11 @@
-import { get_approval_amount, res_to_bignumber } from './utils.js' 
 import send_lamden_tx from './send_tx.js'
-import { is_registered } from './utils.js'
 
-export default (network, sender_wallet) => {
+export default (sender_wallet) => {
     let node_cost = null
     let currency_balance = null
 
     async function check_if_registered(){
-        const registered = await is_registered(network, sender_wallet.vk)
+        const registered = await process.app_utils.is_registered(sender_wallet.vk)
 
         if (registered === true) console.log("\n!! Node already registered !!")
 
@@ -16,7 +14,7 @@ export default (network, sender_wallet) => {
 
     async function can_stake(){
         node_cost = await get_node_cost()
-        currency_balance = await network.API.getCurrencyBalance(sender_wallet.vk)
+        currency_balance = await process.lamden_network.API.getCurrencyBalance(sender_wallet.vk)
 
         let has_enough = currency_balance.isGreaterThan(node_cost)
 
@@ -32,13 +30,13 @@ export default (network, sender_wallet) => {
     }
 
     async function get_node_cost(){
-        let balance = await network.getVariable('elect_masternodes', 'member_cost')
+        let balance = await process.lamden_network.getVariable('elect_masternodes', 'member_cost')
         
-        return res_to_bignumber(balance)
+        return process.app_utils.res_to_bignumber(balance)
     }
 
     async function send_approval(){
-        let approval_amount = await get_approval_amount(network, sender_wallet.vk, "elect_masternodes")
+        let approval_amount = await process.app_utils.get_approval_amount(sender_wallet.vk, "elect_masternodes")
         if (approval_amount.isGreaterThan(node_cost)) return
 
         const txInfo = {
@@ -52,7 +50,7 @@ export default (network, sender_wallet) => {
             stampLimit: 50,
         }
 
-        await send_lamden_tx(sender_wallet, network, txInfo)
+        await send_lamden_tx(sender_wallet, txInfo)
     }
 
     async function send_register(){
@@ -64,7 +62,7 @@ export default (network, sender_wallet) => {
             stampLimit: 50,
         }
 
-        await send_lamden_tx(sender_wallet, network, txInfo)      
+        await send_lamden_tx(sender_wallet, txInfo)      
     }
 
     async function send(){

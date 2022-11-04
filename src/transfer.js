@@ -1,6 +1,6 @@
 import Lamden from 'lamden-js'
 
-export default (network) => {
+export default () => {
     async function send(sender_wallet, amount, to){
         const txInfo = {
             senderVk: sender_wallet.vk,
@@ -13,7 +13,7 @@ export default (network) => {
             stampLimit: 50,
         }
 
-        const tx = new Lamden.TransactionBuilder(network, txInfo)
+        const tx = new Lamden.TransactionBuilder(process.lamden_network, txInfo)
 
         await tx.send(sender_wallet.sk)
         let res = await tx.checkForTransactionResult()
@@ -23,8 +23,8 @@ export default (network) => {
         if (res.status === 0) console.log("Transaction Successful!")
         else console.log("Transaction Failed!")
 
-        if (network.blockExplorer) {
-            console.log(`  - ${network.blockExplorer}/transactions/${res.hash}`)
+        if (process.lamden_network.blockExplorer) {
+            console.log(`  - ${process.lamden_network.blockExplorer}/transactions/${res.hash}`)
         }
         
     }

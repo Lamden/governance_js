@@ -1,6 +1,6 @@
 import send_lamden_tx from './send_tx.js'
 
-export default (network) => {
+export default () => {
     async function send(sender_wallet, policy, vote_for){
         const txInfo = {
             senderVk: sender_wallet.vk,
@@ -13,7 +13,7 @@ export default (network) => {
             stampLimit: 50,
         }
 
-        await send_lamden_tx(sender_wallet, network, txInfo)        
+        await send_lamden_tx(sender_wallet, txInfo)        
     }
 
     return {
