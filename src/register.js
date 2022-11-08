@@ -47,7 +47,7 @@ export default (sender_wallet) => {
                 "to": "elect_masternodes",
                 "amount": 100000
             },
-            stampLimit: 50,
+            stampLimit: 100
         }
 
         await send_lamden_tx(sender_wallet, txInfo)
@@ -59,7 +59,7 @@ export default (sender_wallet) => {
             contractName: "elect_masternodes",
             methodName: "register",
             kwargs: {},
-            stampLimit: 50,
+            stampLimit: 100
         }
 
         await send_lamden_tx(sender_wallet, txInfo)      

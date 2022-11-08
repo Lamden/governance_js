@@ -15,7 +15,7 @@ export default (sender_wallet) => {
             contractName: "elect_masternodes",
             methodName: "unregister",
             kwargs: {},
-            stampLimit: 50,
+            stampLimit: 100
         }
 
         await send_lamden_tx(sender_wallet, txInfo)      

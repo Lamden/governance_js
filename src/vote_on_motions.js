@@ -10,7 +10,7 @@ export default () => {
                 policy,
                 value: ["vote_on_motion", vote_for]
             },
-            stampLimit: 50,
+            stampLimit: 200,
         }
 
         await send_lamden_tx(sender_wallet, txInfo)        

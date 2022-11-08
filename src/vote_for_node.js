@@ -17,7 +17,7 @@ export default (sender_wallet) => {
                 to: "elect_masternodes",
                 amount: 1000
             },
-            stampLimit: 50,
+            stampLimit: 100
         }
 
         await send_lamden_tx(sender_wallet, txInfo) 
@@ -31,7 +31,7 @@ export default (sender_wallet) => {
             kwargs: {
                 address: vk
             },
-            stampLimit: 50,
+            stampLimit: 100
         }
 
         await send_lamden_tx(sender_wallet, txInfo)        

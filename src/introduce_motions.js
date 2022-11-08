@@ -14,7 +14,7 @@ export default (sender_wallet) => {
             contractName: "election_house",
             methodName: "vote",
             kwargs: await motion_map[motion](),
-            stampLimit: 100,
+            stampLimit: 100
         }
 
         console.log(`\n[${process.current_prompt()}] Type '${motion}' to confirm`)

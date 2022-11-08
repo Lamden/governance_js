@@ -10,7 +10,7 @@ export default () => {
                 to,
                 amount: {"__fixed__": amount.toString()}
             },
-            stampLimit: 50,
+            stampLimit: 100
         }
 
         const tx = new Lamden.TransactionBuilder(process.lamden_network, txInfo)
