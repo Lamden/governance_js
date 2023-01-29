@@ -3,9 +3,18 @@
         "blockExplorer": "https://www.tauhq.com",
         "currencySymbol": "TAU",
         "hosts": [
-            "https://masternode-01.lamden.io"
+            "http://masternode-01.lamden.io"
         ],
-        "name": "Lamden Mainnet",
+        "name": "Legacy Lamden Mainnet",
+        "type": "mainnet"
+    },
+    {
+        "blockExplorer": "https://arko.tauhq.com",
+        "currencySymbol": "TAU",
+        "hosts": [
+            "http://64.225.32.184:18080"
+        ],
+        "name": "Arko Mainnet",
         "type": "mainnet"
     },
     {

@@ -101,6 +101,7 @@ function pickNetwork(){
 		if (opt === network_list.length + 1) exit()
 		else{
 			process.lamden_network = new Lamden.Network(network_list[opt - 1])
+			console.log(process.lamden_network.getNetworkInfo())
 
 			if (!init) get_sk()
 			else showMainMenu()
