@@ -15,7 +15,9 @@
             "http://64.225.32.184:18080"
         ],
         "name": "Arko Mainnet",
-        "type": "mainnet"
+        "version": 2,
+        "type": "mainnet",
+        "lamden": true
     },
     {
         "currencySymbol": "dTAU",
