@@ -22,22 +22,32 @@ import fs from 'fs'
 
 
 const { wallet } = Lamden
+const aux_network_file = "./aux_networks.json"
 
 // Load AUX Networks
 
 // Check if aux_networks file exist
-if (fs.existsSync(`./aux_network.json`)) {
-	const data = fs.readFileSync(filePath, 'utf-8');
+if (fs.existsSync(aux_network_file)) {
+	let data = false
+	try{
+		data = fs.readFileSync(aux_network_file, 'utf-8');
+	}catch(err){
+		console.log("No AUX networks found")
+	}
 
-	try {
-		const aux_networks_list = JSON.parse(data);
-		if (Array.isArray(aux_networks_list)){
-			for (aux_network of aux_networks_list){
-				network_list.push(aux_network)
-			}	
+	if (data){
+		try {
+			const aux_networks_list = JSON.parse(data);
+
+			if (Array.isArray(network_list) && Array.isArray(aux_networks_list)){
+				for (let aux_network of aux_networks_list){
+					network_list.push(aux_network)
+				}	
+			}
+		} catch (err) {
+			console.log(err)
+			throw new Error(`Invalid aux_network.json (list). Not valid JSON in file: ${aux_network_file}`);
 		}
-	} catch (err) {
-		throw new Error('Invalid aux_network.json (list). Not valid JSON in file: ' + filePath);
 	}
 }
 
@@ -84,10 +94,9 @@ process.router = {
 	"3": vote_for_node_menu,
 	"4": introduce_motions_menu,
 	"5": vote_on_motions_menu,
-	"6": report_missing_blocks,
-	"7": pickNetwork,
-	"8": get_sk,
-	"9": refresh_and_return
+	"6": pickNetwork,
+	"7": get_sk,
+	"8": refresh_and_return
 }
 
 process.current_prompt = () => `${process.lamden_network.name}`
@@ -239,6 +248,7 @@ async function make_transfer(){
 
 	if (okay.toLocaleLowerCase() === 'yes') {
 		let transfer = Transfer()
+		console.log('TRANSFERRING')
 		await transfer.send(sender_wallet, amount, to).catch(console.error)
 	}
 
