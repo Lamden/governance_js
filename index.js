@@ -5,7 +5,8 @@ import pr from 'prompt-sync'
 
 // Router Actions
 import Transfer from './src/transfer.js'
-import IntroduceMotions from './src/introduce_motions.js'
+import MasternodesMotions from './src/masternodes_motions.js'
+import UpgradeMotions from './src/upgrade_motion.js'
 import VoteOnMotions from './src/vote_on_motions.js'
 import Register from './src/register.js'
 import Unregister from './src/unregister.js'
@@ -17,10 +18,38 @@ import network_list from './src/networks.json' assert { type: 'json' }
 // Misc
 import utils from './src/utils.js'
 import util from 'util'
+import fs from 'fs'
 
 
 const { wallet } = Lamden
+const aux_network_file = "./aux_networks.json"
 
+// Load AUX Networks
+
+// Check if aux_networks file exist
+if (fs.existsSync(aux_network_file)) {
+	let data = false
+	try{
+		data = fs.readFileSync(aux_network_file, 'utf-8');
+	}catch(err){
+		console.log("No AUX networks found")
+	}
+
+	if (data){
+		try {
+			const aux_networks_list = JSON.parse(data);
+
+			if (Array.isArray(network_list) && Array.isArray(aux_networks_list)){
+				for (let aux_network of aux_networks_list){
+					network_list.push(aux_network)
+				}	
+			}
+		} catch (err) {
+			console.log(err)
+			throw new Error(`Invalid aux_network.json (list). Not valid JSON in file: ${aux_network_file}`);
+		}
+	}
+}
 
 
 let sender_wallet = null
@@ -39,9 +68,18 @@ const main_menu = [
 ]
 
 const policies = {
-	"masternodes": [
-		"Add Seat", "Remove Member"
-	]
+	"masternodes": {
+		motions: [
+			"Add Seat", "Remove Member"
+		],
+		script: MasternodesMotions
+	},
+	"upgrade":{
+		motions: [
+			"Propose Upgrade"
+		],
+		script: UpgradeMotions
+	}
 }
 const num_of_policies = Object.keys(policies).map(k => k).length
 
@@ -82,6 +120,7 @@ function pickNetwork(){
 	console.log("      SELECT NETWORK")
 	console.log("--------------------------")
 	console.log("  - type BACK to go back or EXIT to quit")
+
 	for (let [index, network] of network_list.entries()){
 		console.log(`${index + 1}) ${network.name}`)
 	}
@@ -209,6 +248,7 @@ async function make_transfer(){
 
 	if (okay.toLocaleLowerCase() === 'yes') {
 		let transfer = Transfer()
+		console.log('TRANSFERRING')
 		await transfer.send(sender_wallet, amount, to).catch(console.error)
 	}
 
@@ -382,24 +422,24 @@ async function introduce_motions_menu(){
 	if(process.app_utils.handle_special_prompts(policy)) return
 	if (!prompt_in_range(policy, num_of_policies)) introduce_motions_menu()
 	
-	const motions = policies[Object.keys(policies).map(k => k)[policy - 1]]
+	const policy_info = policies[Object.keys(policies).map(k => k)[policy - 1]]
 
 	console.log("\nMotions:")
-	for (let [index, motion] of motions.entries()){
+	for (let [index, motion] of policy_info.motions.entries()){
 		console.log(`${index + 1 }) ${motion}`)
 	}
 	
-	console.log(`\n[${process.current_prompt()}] Choose a motion (1-${motions.length})`)
+	console.log(`\n[${process.current_prompt()}] Choose a motion (1-${policy_info.motions.length})`)
 	let okay = process.prompt(": ");
 
 	if(process.app_utils.handle_special_prompts(okay)) return
 
-	if (!prompt_in_range(okay, motions.length)) introduce_motions_menu()
+	if (!prompt_in_range(okay, policy_info.motions.length)) introduce_motions_menu()
 	else{
-		const motion = motions[parseInt(okay) - 1]
+		const motion = policy_info.motions[parseInt(okay) - 1]
 
-		const introduce_motions = IntroduceMotions(sender_wallet)
-		await introduce_motions.send(motion)
+		const motion_script = policy_info.script(sender_wallet)
+		await motion_script.send(motion)
 		introduce_motions_menu()
 	}
 }

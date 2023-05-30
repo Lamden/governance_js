@@ -12,8 +12,10 @@ export default () => {
             },
             stampLimit: 100
         }
-
+        console.log(process.lamden_network)
         const tx = new Lamden.TransactionBuilder(process.lamden_network, txInfo)
+
+        console.log(tx.getAllInfo())
 
         await tx.send(sender_wallet.sk)
         let res = await tx.checkForTransactionResult()

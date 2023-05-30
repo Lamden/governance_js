@@ -23,7 +23,7 @@ export default (sender_wallet) => {
 		if (confirm === motion){
 			await send_lamden_tx(sender_wallet, txInfo)  
 		}else{
-			console.log("\nINTRODUCE MOTION CANCELLED")
+			console.log("\nMASTERNODES MOTION CANCELLED")
 			await process.app_utils.async_sleep(1000)
 		}
     }
@@ -60,6 +60,16 @@ export default (sender_wallet) => {
         return {
             policy: "masternodes",
             value: ["introduce_motion", 1, vk]
+        }
+    }
+
+    async function upgrade_kwargs(){
+        let opt = -1
+
+        while (!process.app_utils.prompt_in_range(opt, current_members.length)){
+            console.log(`\n[${process.current_prompt()}] Which Node to you want to vote out? (1-${current_members.length})`)
+            opt = process.prompt(": ");
+            if(process.app_utils.handle_special_prompts(opt)) return
         }
     }
 

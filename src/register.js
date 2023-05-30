@@ -19,12 +19,12 @@ export default (sender_wallet) => {
         let has_enough = currency_balance.isGreaterThan(node_cost)
 
         if (!has_enough) {
-            console.log(`\n!! Not enough ${network.currencySymbol} to register node !!`)
+            console.log(`\n!! Not enough ${process.lamden_network.currencySymbol} to register node !!`)
         }else{
-            console.log(`\nYou have enough ${network.currencySymbol} to register a node.`)
+            console.log(`\nYou have enough ${process.lamden_network.currencySymbol} to register a node.`)
         }
-        console.log(`  - Node Cost: ${node_cost} ${network.currencySymbol}`)
-        console.log(`  - ${network.currencySymbol} Balance: ${currency_balance}`)
+        console.log(`  - Node Cost: ${node_cost} ${process.lamden_network.currencySymbol}`)
+        console.log(`  - ${process.lamden_network.currencySymbol} Balance: ${currency_balance}`)
 
         return has_enough
     }

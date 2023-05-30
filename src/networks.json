@@ -1,31 +1,14 @@
 [
     {
-        "blockExplorer": "https://www.tauhq.com",
-        "currencySymbol": "TAU",
-        "hosts": [
-            "http://masternode-01.lamden.io"
-        ],
-        "name": "Legacy Lamden Mainnet",
-        "type": "mainnet"
-    },
-    {
         "blockExplorer": "https://arko.tauhq.com",
         "currencySymbol": "TAU",
         "hosts": [
-            "http://64.225.32.184:18080"
+            "https://arko-mn-3.lamden.io"
         ],
         "name": "Arko Mainnet",
         "version": 2,
         "type": "mainnet",
         "lamden": true
-    },
-    {
-        "currencySymbol": "dTAU",
-        "hosts": [
-            "https://testnet-master-1.lamden.io"
-        ],
-        "name": "Lamden Testnet",
-        "type": "testnet"
     },
     {
 			"blockExplorer": "https://testnetv2.tauhq.com",
