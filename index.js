@@ -70,7 +70,7 @@ const main_menu = [
 const policies = {
 	"masternodes": {
 		motions: [
-			"Add Seat", "Remove Member"
+			"Add Seat", "Remove Member", "Remove Seat"
 		],
 		script: MasternodesMotions
 	},

@@ -5,7 +5,8 @@ const prompt = pr()
 export default (sender_wallet) => {
     const motion_map = {
         "Add Seat": add_seat_kwargs,
-        "Remove Member": remove_member_kwargs
+        "Remove Member": remove_member_kwargs,
+        "Remove Seat": remove_seat_kwargs
     }
 
     async function send(motion){
@@ -60,6 +61,13 @@ export default (sender_wallet) => {
         return {
             policy: "masternodes",
             value: ["introduce_motion", 1, vk]
+        }
+    }
+
+    async function remove_seat_kwargs(){
+        return {
+            policy: "masternodes",
+            value: ["introduce_motion", 3]
         }
     }
 
