@@ -3,7 +3,7 @@
         "blockExplorer": "https://arko.tauhq.com",
         "currencySymbol": "TAU",
         "hosts": [
-            "https://arko-mn-3.lamden.io"
+            "https://arko-mn-1.lamden.io"
         ],
         "name": "Arko Mainnet",
         "version": 2,
